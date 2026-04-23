@@ -1,5 +1,7 @@
 package com.bookguesser.api.model;
 
+import java.util.List;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -14,6 +16,9 @@ public class Book {
     private String author;
     private Integer releaseyear;
 
+    @OneToMany(mappedBy = "book_id", fetch = FetchType.LAZY)
+    private List<Cover> covers;
+
     // Getters & Setters
     public String getTitle() {
         return this.title;
@@ -25,5 +30,14 @@ public class Book {
 
     public Integer getReleaseYear() {
         return this.releaseyear;
+    }
+
+    public List<Cover> getCovers() {
+        return this.covers;
+    }
+
+    @Override
+    public String toString() {
+        return this.title;
     }
 }
