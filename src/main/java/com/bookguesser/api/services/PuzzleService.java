@@ -4,8 +4,6 @@ import com.bookguesser.api.model.Book;
 import com.bookguesser.api.model.Puzzle;
 import com.bookguesser.api.repository.PuzzleRepo;
 
-import jakarta.annotation.PostConstruct;
-
 import java.time.LocalDate;
 
 import org.springframework.stereotype.Service;
@@ -19,18 +17,28 @@ public class PuzzleService {
         this.puzzleRepo = puzzleRepo;
     }
 
-    @PostConstruct
-    public void init() {
-        getBookToday();
+    public Puzzle getTodayPuzzle() {
+        String today = LocalDate.now().toString();
+        Puzzle todayPuzzle = puzzleRepo.findByPuzzleDate(today)
+        .orElseThrow(() -> new RuntimeException("No Puzzle Today"));
+        return todayPuzzle;
     }
 
 
     public Book getBookToday() {
-        String today = LocalDate.now().toString();
-        Puzzle todayPuzzle = puzzleRepo.findByPuzzleDate(today)
-        .orElseThrow(() -> new RuntimeException("No Puzzle Today"));
-
+        Puzzle todayPuzzle = getTodayPuzzle();
         return todayPuzzle.getBook();
+    }
 
+    public Book getBookById(Integer id) {
+        Puzzle dayPuzzle = puzzleRepo.findById(id)
+        .orElseThrow(() -> new RuntimeException("No Puzzle on this day"));
+
+        return dayPuzzle.getBook();
+    }
+
+    public int getNumPuzzles() {
+        Puzzle todayPuzzle = getTodayPuzzle();
+        return todayPuzzle.getDay() - 1;
     }
 }

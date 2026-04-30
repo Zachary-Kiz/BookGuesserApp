@@ -19,7 +19,6 @@ public class Book {
     @OneToMany(mappedBy = "book_id", fetch = FetchType.LAZY)
     private List<Cover> covers;
 
-    // Getters & Setters
     public String getTitle() {
         return this.title;
     }

@@ -28,6 +28,10 @@ public class Puzzle {
     @Column(name = "puzzle_date")
     private String puzzleDate;
 
+    public Integer getDay() {
+        return this.id;
+    }
+
     public Book getBook() {
         return this.book;
     }
