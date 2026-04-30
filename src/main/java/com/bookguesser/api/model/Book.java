@@ -15,6 +15,7 @@ public class Book {
     private String title;
     private String author;
     private Integer releaseyear;
+    private String genre;
 
     @OneToMany(mappedBy = "book_id", fetch = FetchType.LAZY)
     private List<Cover> covers;
@@ -29,6 +30,10 @@ public class Book {
 
     public Integer getReleaseYear() {
         return this.releaseyear;
+    }
+
+    public String getGenre() {
+        return this.genre;
     }
 
     public List<Cover> getCovers() {

@@ -13,6 +13,7 @@ public class BookData {
     private String title;
     private String author;
     private Integer releaseyear;
+    private String genre;
     private boolean downloaded;
 
     // Getters & Setters
@@ -26,6 +27,10 @@ public class BookData {
 
     public Integer getReleaseYear() {
         return this.releaseyear;
+    }
+
+    public String getGenre() {
+        return this.genre;
     }
 
     public boolean getDownloaded() {
