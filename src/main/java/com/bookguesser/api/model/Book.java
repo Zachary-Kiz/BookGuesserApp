@@ -20,6 +20,10 @@ public class Book {
     @OneToMany(mappedBy = "book_id", fetch = FetchType.LAZY)
     private List<Cover> covers;
 
+    public Integer getId() {
+        return this.id;
+    }
+
     public String getTitle() {
         return this.title;
     }
