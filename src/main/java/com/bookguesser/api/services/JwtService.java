@@ -19,17 +19,32 @@ import io.jsonwebtoken.security.Keys;
 public class JwtService {
     public static final String SECRET = "5367566859703373367639792F423F452848284D6251655468576D5A71347437";
 
-    public String generateToken(String username) {
+    public String generateAccessToken(String username) {
         Map<String, Object> claims = new HashMap<>();
-        return createToken(claims, username);
+        return createAccessToken(claims, username);
     }
 
-    private String createToken(Map<String, Object> claims, String username) {
+    private String createAccessToken(Map<String, Object> claims, String username) {
         return Jwts.builder()
                 .setClaims(claims)
                 .setSubject(username)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 30))
+                .signWith(getSignKey(), SignatureAlgorithm.HS256)
+                .compact();
+    }
+
+    public String generateRefreshToken(String username) {
+        Map<String, Object> claims = new HashMap<>();
+        return createRefreshToken(claims, username);
+    }
+
+    private String createRefreshToken(Map<String, Object> claims, String username) {
+        return Jwts.builder()
+                .setClaims(claims)
+                .setSubject(username)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24 * 7))
                 .signWith(getSignKey(), SignatureAlgorithm.HS256)
                 .compact();
     }

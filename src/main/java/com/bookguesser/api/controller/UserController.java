@@ -5,12 +5,15 @@ import com.bookguesser.api.model.UserInfo;
 import com.bookguesser.api.services.JwtService;
 import com.bookguesser.api.services.UserInfoService;
 
+import java.util.Map;
+
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import org.springframework.web.bind.annotation.*;
@@ -42,27 +45,35 @@ public class UserController {
             new UsernamePasswordAuthenticationToken(authReq.getUsername(), authReq.getPassword())
         );
         if (authentication.isAuthenticated()) {
-            String jwt = jwtService.generateToken(authReq.getUsername());
+            String accessToken = jwtService.generateAccessToken(authReq.getUsername());
 
-            ResponseCookie cookie = ResponseCookie.from("token", jwt)
+            String refreshToken = jwtService.generateRefreshToken(authReq.getUsername());
+
+            ResponseCookie cookie = ResponseCookie.from("token", refreshToken)
                 .httpOnly(true)
                 .secure(true)
                 .path("/")
-                .maxAge(60 * 60 * 24)
+                .maxAge(60 * 60 * 24 * 7)
                 .sameSite("Strict")
                 .build();
 
-            return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie.toString()).body("Login Successful");
+            return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie.toString()).body(Map.of(
+                "accessToken", accessToken
+            ));
         } else {
             throw new UsernameNotFoundException("Invalid User Request!");
         }
     }
 
-    @GetMapping("/user/isLoggedIn")
+    @GetMapping("/user/refresh")
     public ResponseEntity<?> isLoggedIn(Authentication auth) {
         if (auth == null) {
             return ResponseEntity.status(401).build();
         }
-        return ResponseEntity.ok(auth.getName());
+
+        String accessToken = jwtService.generateAccessToken(auth.getName());
+        return ResponseEntity.ok().body(Map.of(
+            "accessToken", accessToken
+        ));
     }
 }
