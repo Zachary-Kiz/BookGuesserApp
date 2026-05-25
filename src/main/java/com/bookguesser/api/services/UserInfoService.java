@@ -26,19 +26,19 @@ public class UserInfoService implements UserDetailsService {
         this.encoder = encoder;
     }
 
-    // Method to load user details by username (email)
+    // Method to load user details by username
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        // Fetch user from the database by email (username)
+        // Fetch user from the database by username
         Optional<UserInfo> userInfo = repository.findByUsername(username);
         
         if (userInfo.isEmpty()) {
-            throw new UsernameNotFoundException("User not found with email: " + username);
+            throw new UsernameNotFoundException("User not found with username: " + username);
         }
         
         // Convert UserInfo to UserDetails (UserInfoDetails)
         UserInfo user = userInfo.get();
-        return new User(user.getEmail(), user.getPassword(), List.of(new SimpleGrantedAuthority(user.getRoles())));
+        return new User(user.getUsername(), user.getPassword(), List.of(new SimpleGrantedAuthority(user.getRoles())));
     }
 
     // Add any additional methods for registering or managing users

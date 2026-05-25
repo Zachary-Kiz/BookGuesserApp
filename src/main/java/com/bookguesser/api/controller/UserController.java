@@ -5,7 +5,9 @@ import com.bookguesser.api.model.UserInfo;
 import com.bookguesser.api.services.JwtService;
 import com.bookguesser.api.services.UserInfoService;
 
-
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -34,15 +36,33 @@ public class UserController {
         return userService.addUser(userInfo);
     }
 
-    @PostMapping("/generateToken")
-    public String authenticateAndGetToken(@RequestBody AuthRequest authReq) {
+    @PostMapping("/login")
+    public ResponseEntity<?> authenticateAndGetToken(@RequestBody AuthRequest authReq) {
         Authentication authentication = authManager.authenticate(
             new UsernamePasswordAuthenticationToken(authReq.getUsername(), authReq.getPassword())
         );
         if (authentication.isAuthenticated()) {
-            return jwtService.generateToken(authReq.getUsername());
+            String jwt = jwtService.generateToken(authReq.getUsername());
+
+            ResponseCookie cookie = ResponseCookie.from("token", jwt)
+                .httpOnly(true)
+                .secure(true)
+                .path("/")
+                .maxAge(60 * 60 * 24)
+                .sameSite("Strict")
+                .build();
+
+            return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie.toString()).body("Login Successful");
         } else {
             throw new UsernameNotFoundException("Invalid User Request!");
         }
+    }
+
+    @GetMapping("/user/isLoggedIn")
+    public ResponseEntity<?> isLoggedIn(Authentication auth) {
+        if (auth == null) {
+            return ResponseEntity.status(401).build();
+        }
+        return ResponseEntity.ok(auth.getName());
     }
 }
