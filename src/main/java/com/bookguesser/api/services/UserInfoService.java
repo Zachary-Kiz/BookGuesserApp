@@ -42,7 +42,16 @@ public class UserInfoService implements UserDetailsService {
     }
 
     // Add any additional methods for registering or managing users
-    public String addUser(UserInfo userInfo) {
+    public String addUser(UserInfo userInfo) throws Exception {
+        Optional<UserInfo> username = repository.findByUsername(userInfo.getUsername());
+        if (!username.isEmpty()) {
+            throw new Exception("User exists with this username");
+        }
+        Optional<UserInfo> email = repository.findByEmail(userInfo.getEmail());
+
+        if (!email.isEmpty()) {
+            throw new Exception("User exists with this email");
+        }
         // Encrypt password before saving
         userInfo.setPassword(encoder.encode(userInfo.getPassword())); 
         repository.save(userInfo);

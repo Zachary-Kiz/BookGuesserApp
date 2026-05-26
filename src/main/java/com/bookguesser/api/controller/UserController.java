@@ -35,8 +35,15 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public String addNewUser(@RequestBody UserInfo userInfo) {
-        return userService.addUser(userInfo);
+    public ResponseEntity<?> addNewUser(@RequestBody UserInfo userInfo) {
+        try {
+            String message = userService.addUser(userInfo);
+            return ResponseEntity.ok().body(Map.of(
+                "message", message
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.status(409).body(Map.of( "error","Username / Email already exists"));
+        }
     }
 
     @PostMapping("/login")
@@ -51,10 +58,10 @@ public class UserController {
 
             ResponseCookie cookie = ResponseCookie.from("token", refreshToken)
                 .httpOnly(true)
-                .secure(true)
+                .secure(false)
                 .path("/")
                 .maxAge(60 * 60 * 24 * 7)
-                .sameSite("Strict")
+                .sameSite("Lax")
                 .build();
 
             return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie.toString()).body(Map.of(
@@ -63,6 +70,13 @@ public class UserController {
         } else {
             throw new UsernameNotFoundException("Invalid User Request!");
         }
+    }
+
+    @GetMapping("/user")
+    public ResponseEntity<?> getUser(Authentication auth) {
+        return ResponseEntity.ok().body(Map.of(
+            "user", auth.getName()
+        ));
     }
 
     @GetMapping("/user/refresh")
