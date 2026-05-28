@@ -68,7 +68,7 @@ public class UserController {
                 "accessToken", accessToken
             ));
         } else {
-            throw new UsernameNotFoundException("Invalid User Request!");
+            return ResponseEntity.status(404).body(Map.of( "error","User does not exist"));
         }
     }
 
