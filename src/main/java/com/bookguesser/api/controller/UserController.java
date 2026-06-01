@@ -58,7 +58,7 @@ public class UserController {
                 .secure(false)
                 .path("/")
                 .maxAge(60 * 60 * 24 * 7)
-                .sameSite("Lax")
+                .sameSite("None")
                 .build();
 
             return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie.toString()).body(Map.of(
