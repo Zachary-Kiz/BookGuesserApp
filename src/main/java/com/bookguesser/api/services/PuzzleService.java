@@ -1,11 +1,14 @@
 package com.bookguesser.api.services;
 
+import com.bookguesser.api.entity.TodayPuzzle;
 import com.bookguesser.api.model.Book;
 import com.bookguesser.api.model.Puzzle;
 import com.bookguesser.api.repository.PuzzleRepo;
 
 import java.time.LocalDate;
+import java.util.Map;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -25,9 +28,9 @@ public class PuzzleService {
     }
 
 
-    public Book getBookToday() {
+    public TodayPuzzle getBookToday() {
         Puzzle todayPuzzle = getTodayPuzzle();
-        return todayPuzzle.getBook();
+        return new TodayPuzzle(todayPuzzle.getDay(), todayPuzzle.getBook());
     }
 
     public Book getBookById(Integer id) {

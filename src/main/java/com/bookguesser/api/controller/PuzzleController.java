@@ -3,8 +3,8 @@ package com.bookguesser.api.controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.bookguesser.api.entity.TodayPuzzle;
 import com.bookguesser.api.model.Book;
-import com.bookguesser.api.repository.PuzzleRepo;
 import com.bookguesser.api.services.PuzzleService;
 
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,7 +26,7 @@ public class PuzzleController {
     }
 
     @GetMapping("/today")
-    public Book getTodayPuzzle() {
+    public TodayPuzzle getTodayPuzzle() {
         return puzzleService.getBookToday();
     }
 
