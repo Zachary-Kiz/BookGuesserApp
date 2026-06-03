@@ -1,5 +1,6 @@
 package com.bookguesser.api.controller;
 
+import com.bookguesser.api.services.UserStatsService;
 import java.util.Map;
 
 import org.springframework.http.HttpStatus;
@@ -20,10 +21,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 @RequestMapping("/guess")
 public class GuessController {
 
+    private final UserStatsService userStatsService;
     private final PlayerGuessService guessService;
 
-    public GuessController(PlayerGuessService guessService) {
+    public GuessController(PlayerGuessService guessService, UserStatsService userStatsService) {
         this.guessService = guessService;
+        this.userStatsService = userStatsService;
     }
 
     @GetMapping("/prev")
@@ -40,9 +43,10 @@ public class GuessController {
     public ResponseEntity<?> uploadGuess(@RequestBody PlayerGuess guess) {
         try {
             String message = guessService.addGuess(guess);
+            userStatsService.updateStats(guess);
             return ResponseEntity.ok().body(Map.of("message", message));
         } catch (Exception e) {
-            return ResponseEntity.status(404).body(Map.of("error", e.getMessage().toString()));
+            return ResponseEntity.status(404).body(Map.of("error", e.getMessage()));
         }
     }
 }
