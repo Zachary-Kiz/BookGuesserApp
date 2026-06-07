@@ -2,8 +2,13 @@ package com.bookguesser.api.controller;
 
 import com.bookguesser.api.model.AuthRequest;
 import com.bookguesser.api.model.UserInfo;
+import com.bookguesser.api.repository.UserStatsRepo;
 import com.bookguesser.api.services.JwtService;
 import com.bookguesser.api.services.UserInfoService;
+
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import java.util.Map;
 
@@ -13,11 +18,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.userdetails.UserDetailsService;
 
 @RestController
 @RequestMapping("/auth")
 public class UserController {
+
+    private final UserStatsRepo userStatsRepo;
 
     private final UserInfoService userService;
 
@@ -25,10 +34,14 @@ public class UserController {
 
     private final AuthenticationManager authManager;
 
-    public UserController(UserInfoService userService, JwtService jwtService, AuthenticationManager authManager) {
+    private final UserDetailsService userDetailsService;
+
+    public UserController(UserInfoService userService, JwtService jwtService, AuthenticationManager authManager, UserStatsRepo userStatsRepo, UserDetailsService userDetailsService) {
         this.userService = userService;
         this.jwtService = jwtService;
         this.authManager = authManager;
+        this.userStatsRepo = userStatsRepo;
+        this.userDetailsService = userDetailsService;
     }
 
     @PostMapping("/register")
@@ -50,20 +63,15 @@ public class UserController {
         );
         if (authentication.isAuthenticated()) {
             String accessToken = jwtService.generateAccessToken(authReq.getUsername());
-
             String refreshToken = jwtService.generateRefreshToken(authReq.getUsername());
 
-            ResponseCookie cookie = ResponseCookie.from("token", refreshToken)
-                .httpOnly(true)
-                .secure(true)
-                .path("/")
-                .maxAge(60 * 60 * 24 * 7)
-                .sameSite("None")
-                .build();
+            ResponseCookie accessCookie = userService.accessTokenCookie(accessToken);
+            ResponseCookie refreshCookie = userService.refreshTokenCookie(refreshToken);
 
-            return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie.toString()).body(Map.of(
-                "accessToken", accessToken
-            ));
+            return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
+                .header(HttpHeaders.SET_COOKIE, accessCookie.toString())
+                .body("Tokens Sent!");
         } else {
             return ResponseEntity.status(404).body(Map.of( "error","User does not exist"));
         }
@@ -72,19 +80,33 @@ public class UserController {
     @GetMapping("/user")
     public ResponseEntity<?> getUser(Authentication auth) {
         return ResponseEntity.ok().body(Map.of(
-            "user", auth.getName()
+            "user", auth.getName(), "stats", userStatsRepo.findByUsername(auth.getName()).get().getStats()
         ));
     }
 
     @GetMapping("/user/refresh")
-    public ResponseEntity<?> isLoggedIn(Authentication auth) {
-        if (auth == null) {
-            return ResponseEntity.status(401).build();
+    public ResponseEntity<?> isLoggedIn(HttpServletRequest request) {
+
+        String refreshToken = null;
+        UserDetails user = null;
+
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("refreshToken".equals(cookie.getName())) {
+                    refreshToken = cookie.getValue();
+                    String username = jwtService.extractUsername(refreshToken);
+                    user = userDetailsService.loadUserByUsername(username);
+                }
+            }
         }
 
-        String accessToken = jwtService.generateAccessToken(auth.getName());
-        return ResponseEntity.ok().body(Map.of(
-            "accessToken", accessToken
-        ));
+        if (refreshToken == null || !jwtService.validateToken(refreshToken, user)) {
+            return ResponseEntity.status(403).build();
+        }
+
+        String accessToken = jwtService.generateAccessToken(user.getUsername());
+        return ResponseEntity.ok()
+                .body(Map.of("accessToken", accessToken));
     }
 }

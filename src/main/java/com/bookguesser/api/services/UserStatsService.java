@@ -22,17 +22,14 @@ public class UserStatsService {
     }
 
     @Transactional
-    public String updateStats(PlayerGuess guess) {
+    public String updateStats(PlayerGuess guess) throws Exception {
 
         Optional<UserStats> userStat = userStatsRepo.findByUsername(guess.getUsername());
 
-        System.out.println(userStat.isEmpty());
-        UserStats foundStat;
         if (userStat.isEmpty()) {
-            foundStat = new UserStats(guess.getUsername());
-        } else {
-            foundStat = userStat.get();
+            throw new Exception("User Stats do not exist");
         }
+        UserStats foundStat = userStat.get();
 
         Map<String, Integer> stats = foundStat.getStats();
         Map<String, Integer> updatedStats = updateVal(guess, stats);
