@@ -51,7 +51,6 @@ public class FriendRequestService {
         FriendRequest friendReq = new FriendRequest(yourId, friendId);
         friendRequestRepo.save(friendReq);
         return "Request Created Successfully!";
-
     }
 
 }
