@@ -1,5 +1,7 @@
 package com.bookguesser.api.model;
 
+import java.util.List;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -25,11 +27,17 @@ public class UserInfo {
     private String password;
     private String roles;
 
+    private List<Integer> friends;
+
     public String getUsername() {
         return this.username;
     }
 
     public String getEmail() {
         return this.email;
+    }
+
+    public List<Integer> getFriends() {
+        return this.friends;
     }
 }

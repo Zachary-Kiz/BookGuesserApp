@@ -45,7 +45,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/register", "/auth/login", "/auth/user/refresh").permitAll()
                         .requestMatchers("/puzzle/**").permitAll()
-                        .requestMatchers("/auth/user/**", "/guess/**").hasAuthority("ROLE_USER")
+                        .requestMatchers("/auth/user/**", "/guess/**", "/friends/**").hasAuthority("ROLE_USER")
                         .requestMatchers("/auth/admin/**").hasAuthority("ROLE_ADMIN")
                         .anyRequest().authenticated()
                 )
