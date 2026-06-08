@@ -41,16 +41,23 @@ public class FriendRequestService {
         Optional<UserInfo> curUser = userInfoRepository.findByUsername(requestUser);
         if (curUser.isEmpty()) throw new Exception("User conducting request does not exist");
 
-        UserInfo realUser = friendUser.get();
-        Integer friendId = realUser.getId();
-
-        UserInfo reqUser = curUser.get();
-        Integer yourId = reqUser.getId();
-
-        if (friendId == yourId) throw new Exception("Cannot be friends with yourself :(");
-        FriendRequest friendReq = new FriendRequest(yourId, friendId);
+        if (username.equals(requestUser)) throw new Exception("Cannot be friends with yourself :(");
+        FriendRequest friendReq = new FriendRequest(requestUser, username);
         friendRequestRepo.save(friendReq);
         return "Request Created Successfully!";
+    }
+
+    public List<String> getUserReqs(String username) throws Exception {
+        Optional<UserInfo> optUser = userInfoRepository.findByUsername(username);
+        if (optUser.isEmpty()) throw new Exception("User does not exist");
+        UserInfo user = optUser.get();
+
+        String userId = user.getUsername();
+        List<String> friendReqs = friendRequestRepo.findAllByToUser(userId)
+                                        .stream()
+                                        .map(FriendRequest::getFromUser)
+                                        .toList();
+        return friendReqs;
     }
 
 }

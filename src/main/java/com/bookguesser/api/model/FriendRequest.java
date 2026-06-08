@@ -11,7 +11,7 @@ import jakarta.persistence.UniqueConstraint;
 @Table(
     name = "friend_request",
     uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"fromId", "toId"})
+        @UniqueConstraint(columnNames = {"fromUser", "toUser"})
     }
 )
 public class FriendRequest {
@@ -19,20 +19,22 @@ public class FriendRequest {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    private Integer fromId;
-    private Integer toId;
+    private String fromUser;
+    private String toUser;
 
-    public FriendRequest(Integer fromId, Integer toId) {
-        this.fromId = fromId;
-        this.toId = toId;
+    public FriendRequest() {}
+
+    public FriendRequest(String fromUser, String toUser) {
+        this.fromUser = fromUser;
+        this.toUser = toUser;
     }
 
-    public Integer getFromId() {
-        return this.fromId;
+    public String getFromUser() {
+        return this.fromUser;
     }
 
-    public Integer getToId() {
-        return this.toId;
+    public String getToUser() {
+        return this.toUser;
     }
 
 }
