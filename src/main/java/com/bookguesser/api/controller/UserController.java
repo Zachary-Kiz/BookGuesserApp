@@ -109,4 +109,25 @@ public class UserController {
         return ResponseEntity.ok()
                 .body(Map.of("accessToken", accessToken));
     }
+
+    @PostMapping("/user/logOut")
+    public ResponseEntity<?> logout() {
+
+        System.out.println("IS THIS WORKING");
+
+        ResponseCookie accessCookie = ResponseCookie.from("accessToken", "")
+                .maxAge(0)
+                .path("/")
+                .build();
+
+        ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", "")
+                .maxAge(0)
+                .path("/")
+                .build();
+
+        return ResponseEntity.ok()
+            .header(HttpHeaders.SET_COOKIE, accessCookie.toString())
+            .header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
+            .build();
+    }
 }

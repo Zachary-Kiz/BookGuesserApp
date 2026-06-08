@@ -43,11 +43,17 @@ public class SecurityConfig {
                 .cors(Customizer.withDefaults())
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/register", "/auth/login", "/auth/user/refresh").permitAll()
+                        .requestMatchers("/auth/register", "/auth/login", "/auth/user/refresh", "/auth/user/logOut").permitAll()
                         .requestMatchers("/puzzle/**").permitAll()
                         .requestMatchers("/auth/user/**", "/guess/**", "/friends/**").hasAuthority("ROLE_USER")
                         .requestMatchers("/auth/admin/**").hasAuthority("ROLE_ADMIN")
                         .anyRequest().authenticated()
+                )
+                .logout(logout -> logout
+                    .logoutUrl("/auth/logOut")
+                    .deleteCookies("accessToken", "refreshToken")
+                    .clearAuthentication(true)
+                    .invalidateHttpSession(true)
                 )
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authProvider)
