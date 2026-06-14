@@ -96,6 +96,8 @@ public class FriendRequestService {
         userInfoRepository.save(from);
         userInfoRepository.save(to);
 
+        friendRequestRepo.deleteByFromUserAndToUser(req.getFromUser(), req.getToUser());
+
         return "Added friend successfully!";
     }
 
