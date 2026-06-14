@@ -3,6 +3,7 @@ package com.bookguesser.api.controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.bookguesser.api.model.FriendRequest;
 import com.bookguesser.api.model.UserInfo;
 import com.bookguesser.api.services.FriendRequestService;
 import com.bookguesser.api.services.UserInfoDetails;
@@ -57,6 +58,27 @@ public class FriendController {
         }
         
     }
+
+    @PostMapping("/deleteReq")
+    public ResponseEntity<?> deleteReq(@RequestBody FriendRequest friendReq) {
+        try {
+            String message = friendRequestService.deleteRequest(friendReq);
+            return ResponseEntity.ok().body(Map.of("message", message));
+        } catch (Exception e) {
+            return ResponseEntity.status(404).body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    @PostMapping("/acceptReq")
+    public ResponseEntity<?> acceptReq(@RequestBody FriendRequest request) {
+        try {
+            String message = friendRequestService.acceptRequest(request);
+            return ResponseEntity.ok().body(Map.of("message", message));
+        } catch (Exception e) {
+            return ResponseEntity.status(404).body(Map.of("error", e.getMessage()));
+        }
+    }
+    
     
     
 }

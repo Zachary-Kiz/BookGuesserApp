@@ -8,4 +8,6 @@ import java.util.List;
 
 public interface FriendRequestRepo extends JpaRepository<FriendRequest ,Integer> {
     List<FriendRequest> findAllByToUser(String username);
+    boolean existsByFromUserAndToUser(String fromUser, String toUser);
+    void deleteByFromUserAndToUser(String fromUser, String toUser);
 }
