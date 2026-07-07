@@ -101,4 +101,13 @@ public class FriendRequestService {
         return "Added friend successfully!";
     }
 
+    public List<String> getFriends(String username) throws Exception {
+        Optional<UserInfo> optUser = userInfoRepository.findByUsername(username);
+        if (optUser.isEmpty()) throw new Exception("User does not exist");
+
+        UserInfo user = optUser.get();
+        List<String> userFriends = user.getFriends();
+        return userFriends;
+    }
+
 }

@@ -2,7 +2,6 @@ package com.bookguesser.api.entity;
 
 import com.bookguesser.api.model.Book;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data

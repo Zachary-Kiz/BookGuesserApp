@@ -4,16 +4,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bookguesser.api.model.FriendRequest;
-import com.bookguesser.api.model.UserInfo;
 import com.bookguesser.api.services.FriendRequestService;
-import com.bookguesser.api.services.UserInfoDetails;
 
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -79,6 +76,17 @@ public class FriendController {
         }
     }
     
+    @GetMapping
+    public ResponseEntity<?> getFriends(Authentication auth) {
+        try {
+            List<String> userFriends = friendRequestService.getFriends(auth.getName());
+            return ResponseEntity.ok().body(Map.of("friends", userFriends));
+        } catch (Exception e) {
+            return ResponseEntity.status(404).body(Map.of("error", e.getMessage()));
+        }
+        
+
+    }
     
     
 }

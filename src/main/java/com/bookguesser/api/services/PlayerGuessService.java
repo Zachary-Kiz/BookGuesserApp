@@ -1,8 +1,8 @@
 package com.bookguesser.api.services;
 
+import java.util.List;
 import java.util.Optional;
 
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
 import com.bookguesser.api.model.PlayerGuess;
@@ -55,6 +55,18 @@ public class PlayerGuessService {
         }
         PlayerGuess guess = prevGuess.get();
         return guess;
+    }
+
+    public List<PlayerGuess> getFriendGuesses(String username, Integer puzzleId) throws Exception {
+        Optional<UserInfo> optUser = userRepo.findByUsername(username);
+        if (optUser.isEmpty()) throw new Exception("User does not exist");
+
+        UserInfo user = optUser.get();
+        List<String> friends = user.getFriends();
+
+        List<PlayerGuess> allGuesses = guessRepo.findByPuzzleIdAndUsernameIn(puzzleId, friends);
+        return allGuesses;
+
     }
 
 }

@@ -1,10 +1,13 @@
 package com.bookguesser.api.controller;
 
 import com.bookguesser.api.services.UserStatsService;
+
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -49,4 +52,15 @@ public class GuessController {
             return ResponseEntity.status(404).body(Map.of("error", e.getMessage()));
         }
     }
+
+    @GetMapping("/friends")
+    public ResponseEntity<?> getFriendGuesses(@RequestParam Integer puzzleId, Authentication auth) {
+        try {
+            List<PlayerGuess> guesses = guessService.getFriendGuesses(auth.getName(), puzzleId);
+            return ResponseEntity.ok().body(guesses);
+        } catch (Exception e) {
+            return ResponseEntity.status(404).body(Map.of("error", e.getMessage()));
+        }
+    }
+    
 }
