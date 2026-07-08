@@ -29,8 +29,14 @@ public class FriendController {
     }
 
     @GetMapping("/getUsers")
-    public List<String> getMethodName(@RequestParam String username) {
-        return friendRequestService.getUserSearch(username);
+    public ResponseEntity<?> getUsers(@RequestParam String username, Authentication auth) {
+        try {
+            List<String> users = friendRequestService.getUserSearch(username, auth.getName());
+            return ResponseEntity.ok(users);
+        } catch (Exception e) {
+            return ResponseEntity.status(404).body(Map.of("error", e.getMessage()));
+        }
+        
     }
 
     @GetMapping("/getRequests")

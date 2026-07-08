@@ -25,11 +25,20 @@ public class FriendRequestService {
         this.friendRequestRepo = friendRequestRepo;
     }
 
-    public List<String> getUserSearch(String username) {
+    public List<String> getUserSearch(String username, String curUser) throws Exception {
+        Optional<UserInfo> optUser = userInfoRepository.findByUsername(curUser);
+        if (optUser.isEmpty()) {
+            throw new Exception("User account does not exist");
+        }
+        UserInfo user = optUser.get();
+        List<String> friends = user.getFriends();
+        friends.add(curUser);
         List<String> users = userInfoRepository.findByUsernameContainingIgnoreCase(username)
             .stream()
             .map(UserInfo::getUsername)
+            .filter(newUser -> !friends.contains(newUser))
             .toList();
+        
         if (users.size() > MAX_SIZE) {
             users = users.subList(0, MAX_SIZE);
         }
