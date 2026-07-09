@@ -67,6 +67,7 @@ public class UserInfoService implements UserDetailsService {
     public ResponseCookie accessTokenCookie(String accessToken) {
         return ResponseCookie.from("accessToken", accessToken)
                 .httpOnly(true)
+                .domain(".bookguesser.app")
                 .secure(true)
                 .path("/")
                 .maxAge(60 * 30)
@@ -77,6 +78,7 @@ public class UserInfoService implements UserDetailsService {
     public ResponseCookie refreshTokenCookie(String refreshToken) {
         return ResponseCookie.from("refreshToken", refreshToken)
                 .httpOnly(true)
+                .domain(".bookguesser.app")
                 .secure(true)
                 .path("/")
                 .maxAge(60 * 60 * 24 * 7)
